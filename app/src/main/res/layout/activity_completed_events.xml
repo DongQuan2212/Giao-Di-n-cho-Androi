@@ -11,7 +11,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="49dp"
         android:background="@color/bg"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:elevation="4dp">
@@ -41,15 +41,15 @@
         android:layout_weight="1"
         android:radius="12dp"
         app:cardElevation="6dp"
-        android:layout_marginTop="10dp"
+
         android:background="@android:color/white">
 
         <ListView
             android:id="@+id/completedEventListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"
+            android:divider="@android:color/white"
+            android:dividerHeight="10dp"
             android:background="@android:color/white"
             android:padding="8dp" />
     </androidx.cardview.widget.CardView>

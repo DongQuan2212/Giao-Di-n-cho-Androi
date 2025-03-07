@@ -35,6 +35,8 @@
         android:layout_marginTop="7dp"
         android:layout_marginBottom="15dp"
         app:cardCornerRadius="12dp"
+        android:scaleX="0.95"
+        android:scaleY="0.95"
         app:cardElevation="6dp">
 
         <CalendarView
@@ -47,6 +49,10 @@
 
     <!-- ListView -->
     <ListView
+        android:dividerHeight="8dp"
+        android:divider="@android:color/white"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:background="@color/white"
         android:id="@+id/ListView_Event"
         android:layout_width="match_parent"
