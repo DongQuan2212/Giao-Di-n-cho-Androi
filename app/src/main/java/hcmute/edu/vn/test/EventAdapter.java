@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import java.util.List;
 
 public class EventAdapter extends BaseAdapter {
@@ -23,17 +22,18 @@ public class EventAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return eventList.size();
+        return (eventList != null) ? eventList.size() : 0; // ✅ Tránh lỗi NullPointerException
     }
 
     @Override
     public Object getItem(int position) {
-        return eventList.get(position);
+        return (eventList != null && position < eventList.size()) ? eventList.get(position) : null;
     }
 
     @Override
     public long getItemId(int position) {
-        return eventList.get(position).getId();
+        Event event = (Event) getItem(position);
+        return (event != null) ? event.getId() : -1; // ✅ Tránh lỗi nếu event bị null
     }
 
     @Override
@@ -50,16 +50,22 @@ public class EventAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Event event = eventList.get(position);
-        holder.txtEventTitle.setText(event.getTitle());
-        holder.txtEventDate.setText("Ngày: " + event.getDate());
-        holder.txtEventTime.setText("Giờ: " + (event.getTime() == null ? "Chưa chọn" : event.getTime()));
-        Log.d("EventAdapter", "Event: " + event.getTitle() + ", Date: " + event.getDate() + ", Time: " + event.getTime());
+        Event event = (Event) getItem(position);
+        if (event != null) {
+            holder.txtEventTitle.setText(event.getTitle());
+            holder.txtEventDate.setText("Ngày: " + event.getDate());
+            holder.txtEventTime.setText("Giờ: " + (event.getTime().isEmpty() ? "Chưa chọn" : event.getTime())); // ✅ Tránh null
+            Log.d("EventAdapter", "Event: " + event.getTitle() + ", Date: " + event.getDate() + ", Time: " + event.getTime());
+        }
+
         return convertView;
-
-
     }
 
+    // ✅ Phương thức cập nhật danh sách sự kiện
+    public void updateEvents(List<Event> newEvents) {
+        this.eventList = newEvents;
+        notifyDataSetChanged(); // Cập nhật lại ListView
+    }
 
     private static class ViewHolder {
         TextView txtEventTitle, txtEventDate, txtEventTime;

@@ -11,11 +11,12 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="6dp">
     <ScrollView
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true">
     <LinearLayout
-        android:background="#94FAE9E6"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -107,6 +108,8 @@
                 />
 
             <View
+                android:id="@+id/kc1"
+                android:visibility="gone"
                 android:layout_width="10dp"
                 android:layout_height="match_parent"/>
             <Button
@@ -115,11 +118,13 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Hoàn thành"
+                android:text="@string/ho_n_th_nh"
                 android:backgroundTint="@color/green"
                 android:textColor="@color/white"/>
 
             <View
+                android:id="@+id/kc2"
+                android:visibility="gone"
                 android:layout_width="10dp"
                 android:layout_height="match_parent"/>
 

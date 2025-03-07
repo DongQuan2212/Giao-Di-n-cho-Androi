@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,14 +80,9 @@ public class CompletedEventAdapter extends BaseAdapter {
 
         return convertView;
     }
-
-
-
-
     static class ViewHolder {
         TextView txtEventTitle;
         TextView txtEventDate;
-        TextView txtCompletedDate;
         TextView txtCompletedTime;
         ImageView btnDelete;
     }
