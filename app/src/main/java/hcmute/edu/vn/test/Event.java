@@ -27,10 +27,6 @@ public class Event {
         this(id, date, title, description, time, status, "", "");  // ✅ Gọi constructor đầy đủ, tránh null
     }
 
-    // Constructor không tham số
-    public Event() {
-        this(0, "", "", "", "", 0, "", "");  // ✅ Khởi tạo mặc định để tránh null
-    }
 
     // 🛠 Getter và Setter
     public long getId() { return id; }

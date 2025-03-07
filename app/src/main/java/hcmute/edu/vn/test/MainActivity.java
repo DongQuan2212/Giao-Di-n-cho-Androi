@@ -1,5 +1,4 @@
 package hcmute.edu.vn.test;
-
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.NotificationChannel;
@@ -11,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,18 +19,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     private CalendarView calendarView;
@@ -52,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         createNotificationChannel();
         checkNotificationPermission();
 
+
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
             notificationManager.cancelAll();
@@ -63,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         btnAddEvent = findViewById(R.id.btn_back_main);
         BottomNavigationView bottomNavigation = findViewById(R.id.nav_bottom);
         dbHelper = new EventDatabaseHelper(this);
+        dbHelper.updateExpiredEvents();
+
 
         // Lấy ngày hiện tại
         Calendar calendar = Calendar.getInstance();
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Load sự kiện
         loadEvents();
-
         // Xử lý chọn ngày trên CalendarView
         calendarView.setOnDateChangeListener((view, y, m, d) -> {
             selectedDate = y + "-" + (m + 1) + "-" + d;
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     private void showEventDialog(Long eventId, String existingTitle, String existingText, String existingTime) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.activity_add_event);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         EditText editTextTitle = dialog.findViewById(R.id.txt_title);
         EditText editTextEvent = dialog.findViewById(R.id.txt_description);
         View view1 = dialog.findViewById(R.id.kc1);
@@ -114,9 +114,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonComplete = dialog.findViewById(R.id.btn_complete);
         Button buttonTime = dialog.findViewById(R.id.btn_setTime);
         TextView textViewTime = dialog.findViewById(R.id.txt_time);
-
         dialog.show();
-
         if (existingTitle != null) {
             editTextTitle.setText(existingTitle);
             editTextEvent.setText(existingText);
@@ -131,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
             buttonDelete.setVisibility(View.GONE);
             buttonComplete.setVisibility(View.GONE);
         }
-
         buttonTime.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -160,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vui lòng chọn thời gian hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (eventIdWrapper[0] == null) { // Thêm sự kiện mới
                 eventIdWrapper[0] = dbHelper.saveEvent(selectedDate, title, description, time);
                 if (eventIdWrapper[0] == -1) {
@@ -181,12 +177,6 @@ public class MainActivity extends AppCompatActivity {
             loadEvents();
         });
 
-
-
-
-
-
-
         buttonComplete.setOnClickListener(v -> {
             if (eventId != null) {
                 dbHelper.markEventAsCompleted(eventId);
@@ -198,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // Xu ly su kien khi an vao button delete
         buttonDelete.setOnClickListener(v -> {
             if (eventId != null) {
                 dbHelper.deleteEvent(eventId);
@@ -232,33 +224,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void setEventReminder(Event event) {
-        long timeInMillis = getTimeInMillis(event.getDate(), event.getTime());
-
-        if (timeInMillis <= System.currentTimeMillis()) {
-            Log.e("setEventReminder", "Thời gian đã qua, không đặt báo thức!");
-            return;
-        }
-
         Intent intent = new Intent(this, EventReminderReceiver.class);
-        intent.putExtra("event_id", event.getId());
+        intent.putExtra("event_id", event.getId()); // Truyền ID của sự kiện
         intent.putExtra("event_title", event.getTitle());
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 this, (int) event.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
-
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
-            } else {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
-            }
-            Log.d("setEventReminder", "Báo thức đặt thành công cho sự kiện: " + event.getTitle());
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, getTimeInMillis(event.getDate(), event.getTime()), pendingIntent);
         }
     }
-
-
 
     public void checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Chỉ yêu cầu trên Android 13+
@@ -268,17 +245,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Permission", "POST_NOTIFICATIONS granted!");
-            } else {
-                Log.e("Permission", "POST_NOTIFICATIONS denied!");
-            }
-        }
-    }
+
     private long getTimeInMillis(String date, String time) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault());
