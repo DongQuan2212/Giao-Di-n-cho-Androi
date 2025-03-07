@@ -40,8 +40,7 @@
         <CalendarView
             android:id="@+id/calendar_View"
             android:layout_width="400dp"
-            android:layout_height="315dp"
-            />
+            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
 
@@ -61,10 +60,11 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/bg"
+        app:itemBackground="@color/bg"
         app:itemIconTint="@color/Toolbar"
-        app:itemTextColor="@color/black"
+        app:itemTextColor="@color/bg"
         app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"
-        android:elevation="6dp"/>
-
+        app:labelVisibilityMode="unlabeled"
+        android:elevation="6dp"
+        app:itemRippleColor="@color/bg"/>
 </LinearLayout>

@@ -1,15 +1,21 @@
 package hcmute.edu.vn.test;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -37,11 +43,21 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> eventAdapter;
     private List<String> eventList = new ArrayList<>();
     private List<Long> eventIds = new ArrayList<>();
+    private BatteryReceiver batteryReceiver;
+    private IntentFilter batteryFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+        // Khởi tạo BatteryReceiver
+        batteryReceiver = new BatteryReceiver();
+        batteryFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+
+        registerReceiver(batteryReceiver, batteryFilter);
 
         // Ánh xạ UI
         calendarView = findViewById(R.id.calendar_View);
@@ -91,8 +107,52 @@ public class MainActivity extends AppCompatActivity {
             editEvent(eventId);
         });
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Hủy đăng ký BroadcastReceiver để tránh rò rỉ bộ nhớ
+        unregisterReceiver(batteryReceiver);
+    }
 
-    // Hiển thị hộp thoại thêm hoặc chỉnh sửa sự kiện
+    public class BatteryReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1); // Lấy mức pin
+            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1); // Lấy trạng thái sạc
+
+            boolean isCharging = (status == BatteryManager.BATTERY_STATUS_CHARGING) ||
+                    (status == BatteryManager.BATTERY_STATUS_FULL);
+
+            // Hiển thị thông tin pin
+            Toast.makeText(context, "Pin: " + level + "% - " + (isCharging ? "Đang sạc" : "Không sạc"), Toast.LENGTH_SHORT).show();
+
+            // Kiểm tra nếu pin yếu (dưới 15%) và không đang sạc thì hiển thị cảnh báo
+            if (level <= 15 && !isCharging) {
+                showLowBatteryDialog(context);
+            }
+        }
+    }
+
+    // Hiển thị cảnh báo pin yếu
+    private void showLowBatteryDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("⚠️ Cảnh báo pin yếu");
+        builder.setMessage("Mức pin của bạn đang thấp! Bạn có muốn bật chế độ tiết kiệm pin không?");
+
+        builder.setPositiveButton("Bật tiết kiệm pin", (dialog, which) -> {
+            // Mở cài đặt tiết kiệm pin của hệ thống
+            Intent intent = new Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS);
+            startActivity(intent);
+        });
+
+        builder.setNegativeButton("Bỏ qua", (dialog, which) -> {
+            dialog.dismiss(); // Đóng hộp thoại
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     private void showEventDialog(Long eventId, String existingTitle, String existingText, String existingTime) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.activity_add_event);
@@ -105,9 +165,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonTime = dialog.findViewById(R.id.btn_setTime);
         Button buttonComplete = dialog.findViewById(R.id.btn_complete);
         TextView textViewTime = dialog.findViewById(R.id.txt_time);
-
         dialog.show();
-
         Window window = dialog.getWindow();
         if (window != null) {
             window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -119,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
             editTextTitle.setText(existingTitle);
             editTextEvent.setText(existingText);
             textViewTime.setText(existingTime != null ? existingTime : "Chưa chọn giờ");
-            buttonDelete.setVisibility(View.VISIBLE);
-            buttonComplete.setVisibility(View.VISIBLE);
-        } else {
+            buttonDelete.setVisibility(View.VISIBLE); // Hiện lên lại nút Xóa
+            buttonComplete.setVisibility(View.VISIBLE); // hiện lên lại nút hoàn thành
+        } else { // ngược lại khi ấn vào nút thêm thì ẩn
             buttonDelete.setVisibility(View.GONE);
             buttonComplete.setVisibility(View.GONE);
         }
@@ -133,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
             int minute = calendar.get(Calendar.MINUTE);
             boolean isPM = calendar.get(Calendar.AM_PM) == Calendar.PM;
 
+            // tạo ra layout chọn time cho event
             TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view, selectedHour, selectedMinute) -> {
                 String amPm = (selectedHour >= 12) ? "PM" : "AM";
                 int displayHour = (selectedHour == 0) ? 12 : (selectedHour > 12 ? selectedHour - 12 : selectedHour);
@@ -155,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            // lưu vào database
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("date", selectedDate);
@@ -203,7 +263,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Chỉnh sửa sự kiện
     private void editEvent(long eventId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase(); // lấy thông tin sự kiện từ database
+        // Truy vấn id của sự kiện
         Cursor cursor = db.query("events", new String[]{"title", "event", "time"}, "id = ?", new String[]{String.valueOf(eventId)}, null, null, null);
         if (cursor.moveToFirst()) {
             showEventDialog(eventId, cursor.getString(0), cursor.getString(1), cursor.getString(2));
@@ -231,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Lớp SQLiteOpenHelper để quản lý database
+    // sau này sẽ tạo model cho event này sau
     private static class EventDatabaseHelper extends SQLiteOpenHelper {
         private static final String DATABASE_NAME = "events.db";
         private static final int DATABASE_VERSION = 4;
