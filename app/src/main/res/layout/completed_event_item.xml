@@ -17,7 +17,7 @@
 
         <!-- Nội dung: Tiêu đề + Ngày + Giờ -->
         <LinearLayout
-            android:id="@+id/contentLayout"
+            android:id="@+id/content_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -38,7 +38,7 @@
 
             <!-- Ngày sự kiện -->
             <TextView
-                android:id="@+id/txtEventDate"
+                android:id="@+id/txt_Event_Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ngày sự kiện"
@@ -48,7 +48,7 @@
 
             <!-- Giờ hoàn thành -->
             <TextView
-                android:id="@+id/txtCompletedTime"
+                android:id="@+id/txt_Completed_Time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Giờ hoàn thành"
@@ -59,14 +59,14 @@
 
         <!-- Icon thùng rác -->
         <ImageView
-            android:id="@+id/btnDelete"
+            android:id="@+id/btn_Delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_delete"
             android:padding="4dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            app:tint="#CE1C1C"/>
+            app:tint="#DB0606"/>
 
     </RelativeLayout>
 

@@ -48,7 +48,7 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // ✅ Xóa sự kiện
+    // Xóa sự kiện
     public void deleteEvent(long eventId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("events", "id=?", new String[]{String.valueOf(eventId)});
@@ -59,7 +59,7 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    // ✅ Thêm hoặc cập nhật sự kiện
+    // Thêm hoặc cập nhật sự kiện
     public long saveEvent(String date, String title, String description, String time) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -89,8 +89,6 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
             Log.e("Database", "Không tìm thấy sự kiện để cập nhật.");
         }
     }
-
-
 
     // Đánh dấu sự kiện hoàn thành
     public void markEventAsCompleted(long eventId) {
@@ -126,8 +124,7 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-    // ✅ Lấy ngày của sự kiện theo ID
+    // Lấy ngày của sự kiện theo ID
     public String getEventDate(long eventId) {
         if (eventId <= 0) { // Kiểm tra nếu eventId không hợp lệ
             Log.e("Database", "Lỗi: eventId không hợp lệ!");
@@ -154,7 +151,7 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    // ✅ Lấy một sự kiện theo ID
+    // Lấy một sự kiện theo ID
     public Event getEventById(long eventId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Event event = null;
@@ -175,7 +172,7 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
         return event;
     }
 
-    // ✅ Lấy danh sách sự kiện đã hoàn thành
+    // Lấy danh sách sự kiện đã hoàn thành
     public List<Event> getCompletedEvents() {
         List<Event> eventList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -200,12 +197,12 @@ public class EventDatabaseHelper extends SQLiteOpenHelper {
         return eventList;
     }
 
-    // ✅ Lấy danh sách sự kiện theo ngày
+    // Lấy danh sách sự kiện theo ngày
     public List<Event> getEventsByDate(String date) {
         List<Event> events = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // ✅ Lấy cả sự kiện chưa hoàn thành (0) và sự kiện quá hạn (2)
+        // Lấy cả sự kiện chưa hoàn thành (0) và sự kiện quá hạn (2)
         Cursor cursor = db.query(TABLE_EVENTS, null,
                 "date = ? AND (status = 0 OR status = 2)",
                 new String[]{date}, null, null, null);

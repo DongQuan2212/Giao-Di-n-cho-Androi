@@ -11,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 public class CompletedEventAdapter extends BaseAdapter {
     private Context context;
@@ -49,9 +48,9 @@ public class CompletedEventAdapter extends BaseAdapter {
 
             holder = new ViewHolder();
             holder.txtEventTitle = convertView.findViewById(R.id.txt_Event_Title);
-            holder.txtEventDate = convertView.findViewById(R.id.txtEventDate);
-            holder.txtCompletedTime = convertView.findViewById(R.id.txtCompletedTime);
-            holder.btnDelete = convertView.findViewById(R.id.btnDelete); // ✅ Lấy nút Xóa
+            holder.txtEventDate = convertView.findViewById(R.id.txt_Event_Date);
+            holder.txtCompletedTime = convertView.findViewById(R.id.txt_Completed_Time);
+            holder.btnDelete = convertView.findViewById(R.id.btn_Delete); // ✅ Lấy nút Xóa
 
             convertView.setTag(holder);
         } else {
@@ -63,7 +62,7 @@ public class CompletedEventAdapter extends BaseAdapter {
         holder.txtEventDate.setText("Ngày sự kiện: " + event.getDate());
         holder.txtCompletedTime.setText("Giờ hoàn thành: " + event.getCompletedTime());
 
-        // ✅ Xử lý khi bấm nút Xóa
+        //  Xử lý khi bấm nút Xóa
         holder.btnDelete.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Xóa sự kiện")

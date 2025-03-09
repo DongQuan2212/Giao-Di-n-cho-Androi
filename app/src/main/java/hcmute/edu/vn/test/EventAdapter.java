@@ -22,7 +22,7 @@ public class EventAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return (eventList != null) ? eventList.size() : 0; // ✅ Tránh lỗi NullPointerException
+        return (eventList != null) ? eventList.size() : 0; // Tránh lỗi NullPointerException
     }
 
     @Override
@@ -33,7 +33,7 @@ public class EventAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         Event event = (Event) getItem(position);
-        return (event != null) ? event.getId() : -1; // ✅ Tránh lỗi nếu event bị null
+        return (event != null) ? event.getId() : -1; // Tránh lỗi nếu event bị null
     }
 
     @Override
@@ -43,8 +43,8 @@ public class EventAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_event, parent, false);
             holder = new ViewHolder();
             holder.txtEventTitle = convertView.findViewById(R.id.txt_Event_Title);
-            holder.txtEventDate = convertView.findViewById(R.id.txtEventDate);
-            holder.txtEventTime = convertView.findViewById(R.id.txtEventTime);
+            holder.txtEventDate = convertView.findViewById(R.id.txt_Event_Date);
+            holder.txtEventTime = convertView.findViewById(R.id.txt_Event_Time);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -61,7 +61,7 @@ public class EventAdapter extends BaseAdapter {
         return convertView;
     }
 
-    // ✅ Phương thức cập nhật danh sách sự kiện
+    // Phương thức cập nhật danh sách sự kiện
     public void updateEvents(List<Event> newEvents) {
         this.eventList = newEvents;
         notifyDataSetChanged(); // Cập nhật lại ListView

@@ -9,7 +9,7 @@
 
     <!-- Toolbar với nút Back -->
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_list_event_complete"
         android:layout_width="match_parent"
         android:layout_height="49dp"
         android:background="@color/bg"
@@ -45,7 +45,7 @@
         android:background="@android:color/white">
 
         <ListView
-            android:id="@+id/completedEventListView"
+            android:id="@+id/list_event_complete"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@android:color/white"

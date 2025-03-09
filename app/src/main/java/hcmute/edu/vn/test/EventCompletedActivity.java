@@ -16,8 +16,7 @@ public class EventCompletedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_completed_events);
-
-        completedEventListView = findViewById(R.id.completedEventListView);
+        completedEventListView = findViewById(R.id.list_event_complete);
         ImageView btnBack = findViewById(R.id.btn_back_main);
 
         dbHelper = new EventDatabaseHelper(this);

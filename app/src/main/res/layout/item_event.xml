@@ -31,7 +31,7 @@
             android:textColor="@android:color/black" />
 
         <TextView
-            android:id="@+id/txtEventDate"
+            android:id="@+id/txt_Event_Date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
@@ -39,7 +39,7 @@
             android:textColor="@android:color/darker_gray" />
 
         <TextView
-            android:id="@+id/txtEventTime"
+            android:id="@+id/txt_Event_Time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 

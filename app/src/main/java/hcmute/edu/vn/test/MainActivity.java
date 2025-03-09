@@ -46,9 +46,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        createNotificationChannel();
-        checkNotificationPermission();
-
 
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -59,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         // Ánh xạ View
         calendarView = findViewById(R.id.calendar_View);
         eventListView = findViewById(R.id.ListView_Event);
-        btnAddEvent = findViewById(R.id.btn_back_main);
+        btnAddEvent = findViewById(R.id.btn_add_event);
         BottomNavigationView bottomNavigation = findViewById(R.id.nav_bottom);
         dbHelper = new EventDatabaseHelper(this);
         dbHelper.updateExpiredEvents();
@@ -71,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Load sự kiện
         loadEvents();
+
         // Xử lý chọn ngày trên CalendarView
         calendarView.setOnDateChangeListener((view, y, m, d) -> {
             selectedDate = y + "-" + (m + 1) + "-" + d;
@@ -101,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    // khởi tạo ra 1 trang dialog cho việc thêm 1 event
     private void showEventDialog(Long eventId, String existingTitle, String existingText, String existingTime) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.activity_add_event);
@@ -109,10 +108,10 @@ public class MainActivity extends AppCompatActivity {
         EditText editTextEvent = dialog.findViewById(R.id.txt_description);
         View view1 = dialog.findViewById(R.id.kc1);
         View view2 = dialog.findViewById(R.id.kc2);
-        Button buttonSave = dialog.findViewById(R.id.btn_save);
+        Button buttonSave = dialog.findViewById(R.id.btn_save_time);
         Button buttonDelete = dialog.findViewById(R.id.btn_delete);
         Button buttonComplete = dialog.findViewById(R.id.btn_complete);
-        Button buttonTime = dialog.findViewById(R.id.btn_setTime);
+        Button buttonTime = dialog.findViewById(R.id.btn_set_Time);
         TextView textViewTime = dialog.findViewById(R.id.txt_time);
         dialog.show();
         if (existingTitle != null) {
@@ -137,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 String amPm = (selectedHour >= 12) ? "PM" : "AM";
                 int displayHour = (selectedHour == 0) ? 12 : (selectedHour > 12 ? selectedHour - 12 : selectedHour);
                 textViewTime.setText(String.format("%02d:%02d %s", displayHour, selectedMinute, amPm));
-            }, hour, minute, false).show();
+            }, hour, minute, true).show();
         });
 
         final Long[] eventIdWrapper = {eventId}; // Dùng mảng để chứa eventId
@@ -187,8 +186,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Sự kiện không hợp lệ", Toast.LENGTH_SHORT).show();
             }
         });
-
-
         // Xu ly su kien khi an vao button delete
         buttonDelete.setOnClickListener(v -> {
             if (eventId != null) {
@@ -213,21 +210,11 @@ public class MainActivity extends AppCompatActivity {
         eventListView.setAdapter(eventAdapter);
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("event_channel", "Lịch Nhắc Nhở", NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("Thông báo sự kiện");
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
-    }
+
     private void setEventReminder(Event event) {
         Intent intent = new Intent(this, EventReminderReceiver.class);
-        intent.putExtra("event_id", event.getId()); // Truyền ID của sự kiện
-        intent.putExtra("event_title", event.getTitle());
-
+        intent.putExtra("event_id", event.getId()); // Truyền id của sự kiện
+        intent.putExtra("event_title", event.getTitle()); // truyền tiêu đề của cái sự kiện
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 this, (int) event.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -237,14 +224,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void checkNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Chỉ yêu cầu trên Android 13+
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
-    }
 
+
+
+    // Xét thời gian bằng giây để xác thực việc đặt event đúng và kog bị sai
 
     private long getTimeInMillis(String date, String time) {
         try {
@@ -260,6 +243,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         BottomNavigationView bottomNavigation = findViewById(R.id.nav_bottom);
-        bottomNavigation.setSelectedItemId(R.id.icon_home);
+        bottomNavigation.setSelectedItemId(R.id.icon_home); // Môi khi chạy lại trang main thì nó load lại navBottom cho đúng icon đc hiển thị
     }
 }

@@ -18,13 +18,13 @@ public class Event {
         this.description = description;
         this.time = time;
         this.status = status;
-        this.completedDate = completedDate != null ? completedDate : "";  // ✅ Tránh null
-        this.completedTime = completedTime != null ? completedTime : "";  // ✅ Tránh null
+        this.completedDate = completedDate != null ? completedDate : "";  // Tránh null
+        this.completedTime = completedTime != null ? completedTime : "";  // Tránh null
     }
 
-    // Constructor không có completedDate và completedTime (sự kiện chưa hoàn thành)
+
     public Event(long id, String date, String title, String description, String time, int status) {
-        this(id, date, title, description, time, status, "", "");  // ✅ Gọi constructor đầy đủ, tránh null
+        this(id, date, title, description, time, status, "", "");  // Gọi constructor đầy đủ, tránh null
     }
 
 

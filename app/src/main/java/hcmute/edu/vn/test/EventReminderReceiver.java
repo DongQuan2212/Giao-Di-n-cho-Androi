@@ -47,8 +47,6 @@ public class EventReminderReceiver extends BroadcastReceiver {
     // Hiển thị thông báo
     private void showNotification(Context context, long eventId, String title) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-
         Intent openAppIntent = new Intent(context, MainActivity.class); // Khi nhấn mở app
         openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -58,7 +56,7 @@ public class EventReminderReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "event_channel")
                 .setSmallIcon(R.drawable.baseline_calendar_today_24)
                 .setContentTitle("Bạn có 1 sự kiện!")
-                .setContentText("Tiêu đề"+ title)
+                .setContentText("Tiêu đề: "+ title)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent); // 🔥 Nhấn vào thông báo để mở app
@@ -83,14 +81,12 @@ public class EventReminderReceiver extends BroadcastReceiver {
         }
     }
 
-    // ✅ Đánh dấu sự kiện là "quá hạn" trong database
+    //  Đánh dấu sự kiện là "quá hạn" trong database
     private void markEventAsOverdue(Context context, long eventId) {
         EventDatabaseHelper dbHelper = new EventDatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put("status", 2); // 2 là trạng thái quá hạn
-
         db.update("events", values, "id = ?", new String[]{String.valueOf(eventId)});
         db.close();
     }
